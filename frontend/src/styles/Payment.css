@@ -1,0 +1,376 @@
+/* ==================== PAYMENT PAGE ==================== */
+
+/* Payment Page Layout */
+.payment-page {
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+.payment-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Breadcrumb */
+.payment-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  color: #999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.breadcrumb-separator {
+  color: #ccc;
+}
+
+.breadcrumb-active {
+  color: #333;
+  font-weight: 500;
+}
+
+/* Payment Content Grid */
+.payment-content {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 3rem;
+  align-items: start;
+}
+
+.payment-form-section h1 {
+  font-size: 2.5rem;
+  font-family: 'Playfair Display', serif;
+  color: #333;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+/* Payment Sections */
+.payment-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.payment-section h2 {
+  font-size: 1.3rem;
+  font-family: 'Playfair Display', serif;
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #ff6b9d;
+}
+
+.form-group input::placeholder {
+  color: #aaa;
+}
+
+/* Form Row (2 columns) */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Billing Checkbox */
+.billing-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f8f8;
+  border-radius: 8px;
+}
+
+.billing-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #ff6b9d;
+  cursor: pointer;
+}
+
+.billing-checkbox label {
+  font-size: 0.9rem;
+  color: #555;
+  cursor: pointer;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Payment Method */
+.payment-method {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.payment-method-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-method-header input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #ff6b9d;
+  cursor: pointer;
+}
+
+.payment-method-header label {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  margin: 0;
+  flex: 1;
+  cursor: pointer;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.payment-icons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.payment-icon {
+  background: #333;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Payment Actions */
+.payment-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.return-to-cart-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #ff6b9d;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: opacity 0.2s;
+}
+
+.return-to-cart-btn:hover {
+  opacity: 0.8;
+}
+
+.return-to-cart-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.place-order-btn {
+  background: #ff6b9d;
+  color: white;
+  border: none;
+  padding: 1rem 3rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: background 0.2s;
+}
+
+.place-order-btn:hover {
+  background: #ff5589;
+}
+
+/* Payment Order Summary Sidebar */
+.payment-sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+.payment-order-summary {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.payment-order-summary h2 {
+  font-size: 1.4rem;
+  font-family: 'Playfair Display', serif;
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+/* Payment Summary Items */
+.payment-summary-items {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.payment-summary-item {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+}
+
+.payment-summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.payment-summary-item-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  background: #ffeef5;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.payment-summary-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.payment-summary-item-info {
+  flex: 1;
+}
+
+.payment-summary-item-info h4 {
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.payment-summary-item-info p {
+  font-size: 0.85rem;
+  color: #999;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.payment-summary-item-price {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Payment Summary Totals */
+.payment-summary-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.payment-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #666;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.payment-summary-total {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+/* Responsive Payment Page */
+@media (max-width: 1024px) {
+  .payment-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-sidebar {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .payment-container {
+    padding: 1rem;
+  }
+  
+  .payment-form-section h1 {
+    font-size: 2rem;
+  }
+  
+  .payment-section {
+    padding: 1.5rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .place-order-btn,
+  .return-to-cart-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .payment-order-summary {
+    padding: 1.5rem;
+  }
+}
+

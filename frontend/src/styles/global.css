@@ -1,0 +1,153 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Playfair Display', 'Georgia', serif;
+  background-color: #ffffff;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Navbar Styles */
+.navbar {
+  background: rgb(255, 255, 255);
+  padding: 1.2rem 3rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #ff6b9d;
+}
+
+.logo-icon {
+  font-size: 1.3rem;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.nav-menu a {
+  text-decoration: none;
+  color: #333;
+  font-size: 0.9rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 0.5rem 1.2rem;
+  border-radius: 25px;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.nav-menu a:hover {
+  color: #ff6b9d;
+}
+
+.nav-menu a.active {
+  background: #ff6b9d;
+  color: rgb(255, 255, 255);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.signup-btn {
+  background: #ff6b9d;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.signup-btn:hover {
+  background: #ff5589;
+}
+
+.signin-link {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 0.9rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.signin-link:hover {
+  color: #ff6b9d;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.icon-btn:hover {
+  color: #ff6b9d;
+}
+
+.cart-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  position: relative;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.cart-btn:hover {
+  color: #ff6b9d;
+}
+
+.cart-count {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ff6b9d;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+

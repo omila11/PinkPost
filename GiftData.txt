@@ -1,0 +1,67 @@
+This file contains the complete gift data structure with 10 items per subsection.
+Total: 60 Sweet Treats + 50 Drinks + 60 Beauty + 60 Lifestyle + 30 Soft Items + 40 Handmade + 50 Accessories + 40 Tech + 30 Snacks + 2 Flowers = 422 items
+
+Sweet Treats (60 items - 6 subcategories × 10):
+- Chocolates: 10 items
+- Candy Jars: 10 items  
+- Cookies: 10 items
+- Cupcakes: 10 items
+- Macarons: 10 items
+- Brownies: 10 items
+
+Drinks (50 items - 5 subcategories × 10):
+- Coffee Sachets: 10 items
+- Hot Chocolate Mix: 10 items
+- Tea Bags: 10 items
+- Mini Juice Bottles: 10 items
+- Milk Tea Packets: 10 items
+
+Beauty (60 items - 6 subcategories × 10):
+- Scented Candles: 10 items
+- Bath Bombs: 10 items
+- Body Lotion: 10 items
+- Face Masks: 10 items
+- Lip Balm: 10 items
+- Perfume Minis: 10 items
+
+Lifestyle Items (60 items - 6 subcategories × 10):
+- Keychains: 10 items
+- Mini Photo Frames: 10 items
+- Notebooks: 10 items
+- Pens: 10 items
+- Stickers: 10 items
+- Pocket Mirrors: 10 items
+
+Soft Items (30 items - 3 subcategories × 10):
+- Small Plush Toys: 10 items
+- Soft Towels: 10 items
+- Mini Pillows: 10 items
+
+Handmade (40 items - 4 subcategories × 10):
+- Handmade Soaps: 10 items
+- Essential Oils: 10 items
+- Herbal Packets: 10 items
+- Beeswax Candles: 10 items
+
+Accessories (50 items - 5 subcategories × 10):
+- Bracelets: 10 items
+- Necklaces: 10 items
+- Earrings: 10 items
+- Watches: 10 items
+- Hair Clips: 10 items
+
+Tech (40 items - 4 subcategories × 10):
+- Earbuds: 10 items
+- Phone Covers: 10 items
+- Power Bank: 10 items
+- Phone Stand: 10 items
+
+Snacks (30 items - 3 subcategories × 10):
+- Chips: 10 items
+- Nuts: 10 items
+- Crackers: 10 items
+
+Flowers (2 items - no subcategories):
+- 2 items
+
+Due to the large size of the data (422 items), I need to split this into a separate data file or use a more efficient approach.

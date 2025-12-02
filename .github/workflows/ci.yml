@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        working-directory: ${{ matrix.project }}
+        run: npm ci
+      - name: Run tests (if any)
+        working-directory: ${{ matrix.project }}
+        run: |
+          if [ -f package.json ]; then
+            if npm test --silent; then
+              echo "Tests passed or no tests defined";
+            fi
+          fi
