@@ -9,16 +9,11 @@ import SignUp from './pages/SignUp'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import FAQs from './pages/FAQs'
-import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 
 function App() {
   // Simple routing based on window location
   const path = window.location.pathname;
-  
-  if (path === '/admin/login') {
-    return <AdminLogin />;
-  }
   
   if (path === '/admin/dashboard') {
     return <AdminDashboard />;

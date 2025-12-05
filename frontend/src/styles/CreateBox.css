@@ -1,4 +1,13 @@
 /* Create Box Page Styles */
+.create-box-page {
+  min-height: 100vh;
+  background-image: url('/images/system/shopbg8.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
 .create-box-container {
   max-width: 1400px;
   margin: 2rem auto;
