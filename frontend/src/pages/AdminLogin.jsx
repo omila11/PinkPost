@@ -44,9 +44,10 @@ export default function AdminLogin() {
 
       // Redirect based on user role
       if (data.user.role === 'admin') {
-        window.location.href = '/admin/dashboard';
+        console.log('Redirecting to admin dashboard...');
+        window.location.replace('/admin/dashboard');
       } else {
-        window.location.href = '/'; // Redirect to home page for regular users
+        window.location.replace('/'); // Redirect to home page for regular users
       }
     } catch (err) {
       setError(err.message);
