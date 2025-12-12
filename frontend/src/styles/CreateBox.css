@@ -1,7 +1,7 @@
 /* Create Box Page Styles */
 .create-box-page {
   min-height: 100vh;
-  background-image: url('/images/system/shopbg8.png');
+  background-image: url('/images/system/shopbg8.jpeg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -162,6 +162,7 @@
   gap: 1rem;
   margin-bottom: 2rem;
   border-bottom: 2px solid #f0f0f0;
+  overflow: visible;
 }
 
 .category-wrapper {
@@ -209,7 +210,7 @@
   min-width: 200px;
   z-index: 100;
   margin-top: 0.5rem;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .subcategory-item {
