@@ -72,8 +72,8 @@ function SignIn() {
       <div className="auth-container">
       <div className="auth-left">
         <div className="welcome-content">
-          <h1>Welcome Back!</h1>
-          <p>Enter your personal details to access all features</p>
+          <h1>Hello,</h1>
+          <p>Sign up and start your journey with us</p>
           <button className="auth-switch-btn" onClick={() => window.location.href = '/signup'}>
             SIGN UP
           </button>

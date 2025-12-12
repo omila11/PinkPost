@@ -67,7 +67,7 @@ function SignUp() {
   return (
     <>
       <Navbar />
-      <div className="auth-container">
+      <div className="auth-container signup-page">
       <div className="auth-right">
         <div className="auth-form-container">
           <h2>Create Account</h2>
@@ -121,7 +121,7 @@ function SignUp() {
       <div className="auth-left">
         <div className="welcome-content">
           <h1>Welcome Back!</h1>
-          <p>Enter your personal details to access all features</p>
+          <p>To keep connected with us please login with your personal info</p>
           <button className="auth-switch-btn" onClick={() => window.location.href = '/signin'}>
             SIGN IN
           </button>

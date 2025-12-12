@@ -2,20 +2,24 @@
 .auth-container {
   display: flex;
   min-height: calc(100vh - 80px);
+  height: calc(100vh - 80px);
   width: 100%;
   margin-top: 80px;
+  overflow: hidden;
 }
 
 /* Left Side - Welcome Section */
 .auth-left {
   flex: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b9d 0%, #c94b7d 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem;
+  padding: 2rem;
   position: relative;
   overflow: hidden;
+  border-radius: 0 80px 80px 0;
+  margin: 20px 0 20px 20px;
 }
 
 .auth-left::before {
@@ -37,26 +41,26 @@
 }
 
 .welcome-content h1 {
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
   font-family: 'Playfair Display', Georgia, serif;
 }
 
 .welcome-content p {
-  font-size: 1.1rem;
-  margin-bottom: 2.5rem;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
   opacity: 0.95;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .auth-switch-btn {
   background: transparent;
   border: 2px solid white;
   color: white;
-  padding: 0.9rem 3rem;
+  padding: 0.7rem 2.5rem;
   border-radius: 25px;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 1px;
   cursor: pointer;
@@ -65,7 +69,7 @@
 
 .auth-switch-btn:hover {
   background: white;
-  color: #667eea;
+  color: #ff6b9d;
 }
 
 /* Right Side - Form Section */
@@ -74,25 +78,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem;
-  background: #f8f9fa;
+  padding: 1.5rem;
+  background: white;
+  overflow-y: auto;
 }
 
 .auth-form-container {
   background: white;
-  padding: 3rem 2.5rem;
+  padding: 1.5rem 1.8rem;
   border-radius: 15px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 450px;
+  max-width: 380px;
 }
 
 .auth-form-container h2 {
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #333;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-family: 'Playfair Display', Georgia, serif;
 }
 
@@ -100,13 +105,13 @@
 .social-login {
   display: flex;
   justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
 }
 
 .social-btn {
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   border: 1px solid #ddd;
   background: white;
@@ -115,8 +120,9 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .social-btn.facebook {
@@ -153,8 +159,8 @@
 .login-divider {
   text-align: center;
   color: #888;
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.8rem;
   position: relative;
 }
 
@@ -162,7 +168,7 @@
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 0.8rem;
 }
 
 .form-group {
@@ -171,19 +177,20 @@
 
 .form-group input {
   width: 100%;
-  padding: 0.9rem 1.2rem;
+  padding: 0.65rem 0.9rem;
   border: 1px solid #ddd;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   transition: all 0.3s ease;
   background: #f8f9fa;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ff6b9d;
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08), 0 0 0 3px rgba(255, 107, 157, 0.1);
 }
 
 .form-group input::placeholder {
@@ -195,31 +202,31 @@
   background: #fee;
   border: 1px solid #fcc;
   color: #c33;
-  padding: 0.8rem 1rem;
+  padding: 0.6rem 0.8rem;
   border-radius: 8px;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.8rem;
   text-align: center;
 }
 
 /* Submit Button */
 .submit-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b9d 0%, #c94b7d 100%);
   color: white;
   border: none;
-  padding: 1rem 2rem;
+  padding: 0.7rem 2rem;
   border-radius: 25px;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 1rem;
+  margin-top: 0.3rem;
 }
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 5px 20px rgba(255, 107, 157, 0.4);
 }
 
 .submit-btn:disabled {
@@ -268,5 +275,15 @@
     height: 45px;
     font-size: 1.3rem;
   }
+}
+
+/* SignUp Page - Reverse border radius for left side */
+.signup-page .auth-left {
+  border-radius: 80px 0 0 80px;
+  margin: 20px 20px 20px 0;
+}
+
+.signup-page .auth-right {
+  order: -1;
 }
 
