@@ -69,7 +69,7 @@ function SignIn() {
   return (
     <>
       <Navbar />
-      <div className="auth-container">
+      <div className="auth-container signin-page">
       <div className="auth-left">
         <div className="welcome-content">
           <h1>Hello,</h1>

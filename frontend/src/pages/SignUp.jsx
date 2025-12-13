@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/SignUp.css';
+import '../styles/SignIn.css';
 import Navbar from '../components/Navbar';
 
 function SignUp() {
