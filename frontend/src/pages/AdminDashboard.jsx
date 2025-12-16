@@ -762,7 +762,7 @@ export default function AdminDashboard() {
                 {box.image && (
                   <div style={{ width: '100%', height: '200px', backgroundColor: '#f5f5f5', borderRadius: '8px', marginBottom: '1rem', overflow: 'hidden' }}>
                     <img 
-                      src={`/images/products/ebox/${box.image}`} 
+                      src={box.image} 
                       alt={box.name}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
@@ -1695,7 +1695,7 @@ export default function AdminDashboard() {
                 {box.image && (
                   <div style={{ width: '100%', height: '200px', backgroundColor: '#f5f5f5', borderRadius: '8px', marginBottom: '1rem', overflow: 'hidden' }}>
                     <img 
-                      src={`/images/products/complete-boxes/${box.image}`} 
+                      src={box.image} 
                       alt={box.name}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />

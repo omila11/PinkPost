@@ -34,7 +34,7 @@ export default function Shop() {
           id: box._id,
           name: box.name,
           price: parseFloat(box.price).toFixed(2),
-          image: box.image ? `/images/products/complete-boxes/${box.image}` : '/images/box1.jpeg',
+          image: box.image || '/images/box1.jpeg',
           category: box.category,
           description: box.description,
           isFeatured: box.isFeatured

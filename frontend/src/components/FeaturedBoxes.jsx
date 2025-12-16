@@ -19,7 +19,7 @@ export default function FeaturedBoxes() {
           id: box._id,
           title: box.name,
           price: `$${parseFloat(box.price).toFixed(2)}`,
-          image: box.image ? `/images/products/complete-boxes/${box.image}` : '/images/box1.jpeg',
+          image: box.image || '/images/box1.jpeg',
           bgColor: '#f5dcc8',
           category: box.category,
           description: box.description
