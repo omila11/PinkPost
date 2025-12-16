@@ -54,17 +54,35 @@ exports.getGiftItemById = async (req, res) => {
 // Create new gift item (admin only)
 exports.createGiftItem = async (req, res) => {
   try {
-    const { name, price, category, subcategory, image, bg, inStock, stockQuantity } = req.body;
+    const { name, price, category, subcategory, inStock, stock, description } = req.body;
+
+    // Validate required fields
+    if (!name || !price || !category) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name, price, and category are required'
+      });
+    }
+
+    // Handle image path
+    let imagePath = '';
+    if (req.file) {
+      imagePath = `/images/products/${req.file.filename}`;
+    } else {
+      // Use a default placeholder image
+      imagePath = '/images/products/placeholder.jpg';
+    }
 
     const item = new GiftItem({
       name,
-      price,
+      price: parseFloat(price),
       category,
       subcategory: subcategory || '',
-      image,
-      bg: bg || '#ffffff',
-      inStock: inStock !== undefined ? inStock : true,
-      stockQuantity: stockQuantity || 100
+      image: imagePath,
+      bg: '#ff6b9d',
+      inStock: inStock === 'true',
+      stockQuantity: parseInt(stock) || 100,
+      description: description || ''
     });
 
     await item.save();
@@ -75,6 +93,7 @@ exports.createGiftItem = async (req, res) => {
       item
     });
   } catch (error) {
+    console.error('Error creating gift item:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Error creating gift item', 

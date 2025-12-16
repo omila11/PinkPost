@@ -1,6 +1,51 @@
 import { useState, useEffect } from 'react';
 import './AdminDashboard.css';
 import './ProductsManagement.css';
+import { giftItemsAPI } from '../api/adminAPI';
+
+// Categories with subcategories
+const categories = [
+  { 
+    name: 'Sweet Treats', 
+    subcategories: ['Chocolates', 'Candy Jars', 'Cookies', 'Cupcakes', 'Macarons', 'Brownies']
+  },
+  {
+    name: 'Drinks',
+    subcategories: ['Coffee Sachets', 'Hot Chocolate Mix', 'Tea Bags', 'Mini Juice Bottles', 'Milk Tea Packets']
+  },
+  {
+    name: 'Beauty',
+    subcategories: ['Scented Candles', 'Bath Bombs', 'Body Lotion', 'Face Masks', 'Lip Balm', 'Perfume Minis']
+  },
+  {
+    name: 'Lifestyle Items',
+    subcategories: ['Keychains', 'Mini Photo Frames', 'Notebooks', 'Pens', 'Stickers', 'Pocket Mirrors']
+  },
+  {
+    name: 'Soft Items',
+    subcategories: ['Small Plush Toys', 'Soft Towels', 'Mini Pillows']
+  },
+  {
+    name: 'Handmade',
+    subcategories: ['Handmade Soaps', 'Essential Oils', 'Herbal Packets', 'Beeswax Candles']
+  },
+  {
+    name: 'Accessories',
+    subcategories: ['Bracelets', 'Necklaces', 'Earrings', 'Watches', 'Hair Clips']
+  },
+  {
+    name: 'Tech',
+    subcategories: ['Earbuds', 'Phone Covers', 'Power Bank', 'Phone Stand']
+  },
+  {
+    name: 'Snacks',
+    subcategories: ['Chips', 'Nuts', 'Crackers']
+  },
+  { 
+    name: 'Flowers', 
+    subcategories: [] 
+  }
+];
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -29,6 +74,20 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [stockFilter, setStockFilter] = useState('Any');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [imageZoom, setImageZoom] = useState(1);
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    sku: '',
+    category: '',
+    subcategory: '',
+    price: '',
+    stock: '',
+    status: 'Draft',
+    description: '',
+    image: null,
+    imagePreview: null
+  });
 
   // Orders page state
   const [orderSearch, setOrderSearch] = useState('');
@@ -622,7 +681,7 @@ export default function AdminDashboard() {
             <h1>Product Management</h1>
             <p>Manage your inventory, prices, and product details</p>
           </div>
-          <button className="new-product-btn">
+          <button className="new-product-btn" onClick={() => setShowProductModal(true)}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -809,6 +868,400 @@ export default function AdminDashboard() {
             <button className="pagination-btn">3</button>
             <span className="pagination-dots">...</span>
             <button className="pagination-btn">Next</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Product Modal Handlers
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewProduct({
+        ...newProduct,
+        image: file,
+        imagePreview: URL.createObjectURL(file)
+      });
+    }
+  };
+
+  const handleProductInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'category') {
+      // Reset subcategory when category changes
+      setNewProduct({
+        ...newProduct,
+        category: value,
+        subcategory: ''
+      });
+    } else {
+      setNewProduct({
+        ...newProduct,
+        [name]: value
+      });
+    }
+  };
+
+  const handleAddProduct = async () => {
+    try {
+      // Create FormData for image upload
+      const formData = new FormData();
+      formData.append('name', newProduct.name);
+      formData.append('category', newProduct.category);
+      if (newProduct.subcategory) {
+        formData.append('subcategory', newProduct.subcategory);
+      }
+      formData.append('price', newProduct.price);
+      formData.append('stock', newProduct.stock || 0);
+      formData.append('inStock', newProduct.status === 'Published');
+      if (newProduct.description) {
+        formData.append('description', newProduct.description);
+      }
+      if (newProduct.image) {
+        formData.append('image', newProduct.image);
+      }
+
+      // Send to backend
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/gift-items', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        alert('Product added successfully!');
+        setShowProductModal(false);
+        setNewProduct({
+          name: '',
+          sku: '',
+          category: '',
+          subcategory: '',
+          price: '',
+          stock: '',
+          status: 'Draft',
+          description: '',
+          image: null,
+          imagePreview: null
+        });
+      } else {
+        const error = await response.json();
+        alert('Error adding product: ' + (error.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error adding product:', error);
+      alert('Error adding product: ' + error.message);
+    }
+  };
+
+  const renderProductModal = () => {
+    if (!showProductModal) return null;
+
+    return (
+      <div className="modal-overlay" onClick={() => setShowProductModal(false)}>
+        <div className="modal-content product-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>Add New Product</h2>
+            <button className="modal-close" onClick={() => setShowProductModal(false)}>×</button>
+          </div>
+          
+          <div className="modal-body">
+            <div className="product-form-grid">
+              {/* Image Upload */}
+              <div className="form-section full-width">
+                <label className="form-label">Product Image</label>
+                <div className="image-upload-area">
+                  {newProduct.imagePreview ? (
+                    <div className="image-preview-container">
+                      <img 
+                        src={newProduct.imagePreview} 
+                        alt="Preview" 
+                        className="image-preview" 
+                        style={{ transform: `scale(${imageZoom})` }}
+                      />
+                      <div className="image-controls">
+                        <button 
+                          className="zoom-btn"
+                          onClick={() => setImageZoom(prev => Math.min(prev + 0.1, 3))}
+                          type="button"
+                        >
+                          +
+                        </button>
+                        <span className="zoom-level">{Math.round(imageZoom * 100)}%</span>
+                        <button 
+                          className="zoom-btn"
+                          onClick={() => setImageZoom(prev => Math.max(prev - 0.1, 0.5))}
+                          type="button"
+                        >
+                          −
+                        </button>
+                        <button 
+                          className="zoom-btn reset-btn"
+                          onClick={() => setImageZoom(1)}
+                          type="button"
+                        >
+                          Reset
+                        </button>
+                      </div>
+                      <button 
+                        className="remove-image-btn"
+                        onClick={() => {
+                          setNewProduct({...newProduct, image: null, imagePreview: null});
+                          setImageZoom(1);
+                        }}
+                        type="button"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="image-upload-label">
+                      <input 
+                        type="file" 
+                        accept="image/*,.jfif" 
+                        onChange={handleImageUpload}
+                        style={{ display: 'none' }}
+                      />
+                      <div className="upload-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Click to upload or drag and drop</p>
+                        <span>PNG, JPG or GIF (max. 800x400px)</span>
+                      </div>
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Product Name */}
+              <div className="form-section full-width">
+                <label className="form-label">Product Name *</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={newProduct.name}
+                  onChange={handleProductInputChange}
+                  className="form-input"
+                  placeholder="Enter product name"
+                  required
+                />
+              </div>
+
+              {/* SKU */}
+              <div className="form-section">
+                <label className="form-label">SKU</label>
+                <input
+                  type="text"
+                  name="sku"
+                  value={newProduct.sku}
+                  onChange={handleProductInputChange}
+                  className="form-input"
+                  placeholder="e.g., GB-001"
+                />
+              </div>
+
+              {/* Category */}
+              <div className="form-section">
+                <label className="form-label">Category *</label>
+                <select
+                  name="category"
+                  value={newProduct.category}
+                  onChange={handleProductInputChange}
+                  className="form-input"
+                  style={{ color: newProduct.category ? '#1f2937' : '#9ca3af' }}
+                  required
+                >
+                  <option value="" disabled hidden>Select category</option>
+                  <option value="Sweet Treats">Sweet Treats</option>
+                  <option value="Drinks">Drinks</option>
+                  <option value="Beauty">Beauty</option>
+                  <option value="Lifestyle Items">Lifestyle Items</option>
+                  <option value="Soft Items">Soft Items</option>
+                  <option value="Handmade">Handmade</option>
+                  <option value="Accessories">Accessories</option>
+                  <option value="Tech">Tech</option>
+                  <option value="Snacks">Snacks</option>
+                  <option value="Flowers">Flowers</option>
+                </select>
+              </div>
+
+              {/* Subcategory */}
+              {newProduct.category && newProduct.category !== 'Flowers' && (
+                <div className="form-section">
+                  <label className="form-label">Subcategory *</label>
+                  <select
+                    name="subcategory"
+                    value={newProduct.subcategory}
+                    onChange={handleProductInputChange}
+                    className="form-input"
+                    style={{ color: newProduct.subcategory ? '#1f2937' : '#9ca3af' }}
+                    required
+                  >
+                    <option value="" disabled hidden>Select subcategory</option>
+                    
+                    {newProduct.category === 'Sweet Treats' && (
+                      <>
+                        <option value="Chocolates">Chocolates</option>
+                        <option value="Candy Jars">Candy Jars</option>
+                        <option value="Cookies">Cookies</option>
+                        <option value="Cupcakes">Cupcakes</option>
+                        <option value="Macarons">Macarons</option>
+                        <option value="Brownies">Brownies</option>
+                      </>
+                    )}
+                    
+                    {newProduct.category === 'Drinks' && (
+                      <>
+                        <option value="Coffee Sachets">Coffee Sachets</option>
+                        <option value="Hot Chocolate Mix">Hot Chocolate Mix</option>
+                        <option value="Tea Bags">Tea Bags</option>
+                        <option value="Mini Juice Bottles">Mini Juice Bottles</option>
+                        <option value="Milk Tea Packets">Milk Tea Packets</option>
+                      </>
+                    )}
+                    
+                    {newProduct.category === 'Beauty' && (
+                      <>
+                        <option value="Scented Candles">Scented Candles</option>
+                        <option value="Bath Bombs">Bath Bombs</option>
+                        <option value="Body Lotion">Body Lotion</option>
+                        <option value="Face Masks">Face Masks</option>
+                        <option value="Lip Balm">Lip Balm</option>
+                        <option value="Perfume Minis">Perfume Minis</option>
+                      </>
+                    )}
+                    
+                    {newProduct.category === 'Lifestyle Items' && (
+                      <>
+                        <option value="Keychains">Keychains</option>
+                        <option value="Mini Photo Frames">Mini Photo Frames</option>
+                        <option value="Notebooks">Notebooks</option>
+                        <option value="Pens">Pens</option>
+                        <option value="Stickers">Stickers</option>
+                        <option value="Pocket Mirrors">Pocket Mirrors</option>
+                      </>
+                    )}
+                    
+                    {newProduct.category === 'Soft Items' && (
+                      <>
+                        <option value="Small Plush Toys">Small Plush Toys</option>
+                        <option value="Soft Towels">Soft Towels</option>
+                        <option value="Mini Pillows">Mini Pillows</option>
+                      </>
+                    )}
+                    
+                    {newProduct.category === 'Handmade' && (
+                      <>
+                        <option value="Handmade Soaps">Handmade Soaps</option>
+                        <option value="Essential Oils">Essential Oils</option>
+                        <option value="Herbal Packets">Herbal Packets</option>
+                        <option value="Beeswax Candles">Beeswax Candles</option>
+                      </>
+                    )}
+                    
+                    {newProduct.category === 'Accessories' && (
+                      <>
+                        <option value="Bracelets">Bracelets</option>
+                        <option value="Necklaces">Necklaces</option>
+                        <option value="Earrings">Earrings</option>
+                        <option value="Watches">Watches</option>
+                        <option value="Hair Clips">Hair Clips</option>
+                      </>
+                    )}
+                    
+                    {newProduct.category === 'Tech' && (
+                      <>
+                        <option value="Earbuds">Earbuds</option>
+                        <option value="Phone Covers">Phone Covers</option>
+                        <option value="Power Bank">Power Bank</option>
+                        <option value="Phone Stand">Phone Stand</option>
+                      </>
+                    )}
+                    
+                    {newProduct.category === 'Snacks' && (
+                      <>
+                        <option value="Chips">Chips</option>
+                        <option value="Nuts">Nuts</option>
+                        <option value="Crackers">Crackers</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+              )}
+
+              {/* Price */}
+              <div className="form-section">
+                <label className="form-label">Price ($) *</label>
+                <input
+                  type="number"
+                  name="price"
+                  value={newProduct.price}
+                  onChange={handleProductInputChange}
+                  className="form-input"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  required
+                />
+              </div>
+
+              {/* Stock */}
+              <div className="form-section">
+                <label className="form-label">Stock Quantity</label>
+                <input
+                  type="number"
+                  name="stock"
+                  value={newProduct.stock}
+                  onChange={handleProductInputChange}
+                  className="form-input"
+                  placeholder="0"
+                  min="0"
+                />
+              </div>
+
+              {/* Status */}
+              <div className="form-section">
+                <label className="form-label">Status</label>
+                <select
+                  name="status"
+                  value={newProduct.status}
+                  onChange={handleProductInputChange}
+                  className="form-input"
+                >
+                  <option value="Draft">Draft</option>
+                  <option value="Published">Published</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+
+              {/* Description */}
+              <div className="form-section full-width">
+                <label className="form-label">Description</label>
+                <textarea
+                  name="description"
+                  value={newProduct.description}
+                  onChange={handleProductInputChange}
+                  className="form-textarea"
+                  placeholder="Enter product description"
+                  rows="4"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button className="modal-btn-secondary" onClick={() => setShowProductModal(false)}>
+              Cancel
+            </button>
+            <button className="modal-btn-primary" onClick={handleAddProduct}>
+              Add Product
+            </button>
           </div>
         </div>
       </div>
@@ -1610,6 +2063,9 @@ export default function AdminDashboard() {
           }}
         />
       )}
+
+      {/* Product Modal */}
+      {renderProductModal()}
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { giftItemsAPI } from '../api/adminAPI';
 
 const categories = [
   { 
@@ -37,7 +38,10 @@ const categories = [
     name: 'Snacks',
     subcategories: ['Chips', 'Nuts', 'Crackers']
   },
-  { name: 'Flowers', subcategories: [] }
+  { 
+    name: 'Flowers', 
+    subcategories: [] 
+  }
 ];
 
 const gifts = [
@@ -554,6 +558,34 @@ export default function GiftSelector({ selectedGifts, onAddGift, onRemoveGift })
   const [activeCategory, setActiveCategory] = useState('Sweet Treats');
   const [activeSubcategory, setActiveSubcategory] = useState('Chocolates');
   const [showSubcategories, setShowSubcategories] = useState(false);
+  const [gifts, setGifts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await giftItemsAPI.getAll({ inStock: true });
+        // Transform backend data to match frontend format
+        const transformedGifts = response.items.map(item => ({
+          id: item._id,
+          name: item.name,
+          price: item.price,
+          category: item.category,
+          subcategory: item.subcategory || '',
+          image: item.image || `/images/products/${item.category}/${item.subcategory || 'default'}/default.jpg`,
+          bg: '#ff6b9d' // Default background color
+        }));
+        setGifts(transformedGifts);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const filteredGifts = () => {
     if (activeSubcategory) {
@@ -627,38 +659,48 @@ export default function GiftSelector({ selectedGifts, onAddGift, onRemoveGift })
         ))}
       </div>
 
-      <div className="gifts-grid">
-        {filteredGifts().map(gift => {
-          const quantity = getGiftQuantity(gift.id);
-          return (
-            <div key={gift.id} className="gift-item">
-              <div className="gift-image-wrapper" style={{ backgroundColor: gift.bg }}>
-                <img src={gift.image} alt={gift.name} />
-              </div>
-              <div className="gift-info">
-                <h4>{gift.name}</h4>
-                <p className="gift-price">${gift.price.toFixed(2)}</p>
-              </div>
-              {quantity > 0 ? (
-                <div className="quantity-controls">
-                  <button onClick={() => onRemoveGift(gift)}>-</button>
-                  <span>{quantity}</span>
-                  <button onClick={() => onAddGift(gift)}>+</button>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+          Loading products...
+        </div>
+      ) : filteredGifts().length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+          No products available in this category yet.
+        </div>
+      ) : (
+        <div className="gifts-grid">
+          {filteredGifts().map(gift => {
+            const quantity = getGiftQuantity(gift.id);
+            return (
+              <div key={gift.id} className="gift-item">
+                <div className="gift-image-wrapper" style={{ backgroundColor: gift.bg }}>
+                  <img src={gift.image} alt={gift.name} />
                 </div>
-              ) : (
-                <button 
-                  className="add-gift-btn"
-                  onClick={() => onAddGift(gift)}
-                >
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 5v10M5 10h10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
+                <div className="gift-info">
+                  <h4>{gift.name}</h4>
+                  <p className="gift-price">${gift.price.toFixed(2)}</p>
+                </div>
+                {quantity > 0 ? (
+                  <div className="quantity-controls">
+                    <button onClick={() => onRemoveGift(gift)}>-</button>
+                    <span>{quantity}</span>
+                    <button onClick={() => onAddGift(gift)}>+</button>
+                  </div>
+                ) : (
+                  <button 
+                    className="add-gift-btn"
+                    onClick={() => onAddGift(gift)}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10 5v10M5 10h10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
