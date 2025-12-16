@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './AdminDashboard.css';
 import './ProductsManagement.css';
-import { giftItemsAPI } from '../api/adminAPI';
+import { giftItemsAPI, completeBoxAPI } from '../api/adminAPI';
 
 // Categories with subcategories
 const categories = [
@@ -89,6 +89,41 @@ export default function AdminDashboard() {
     imagePreview: null
   });
 
+  // Boxes page state
+  const [boxes, setBoxes] = useState([]);
+  const [boxesLoading, setBoxesLoading] = useState(false);
+  const [showBoxModal, setShowBoxModal] = useState(false);
+  const [boxImageZoom, setBoxImageZoom] = useState(1);
+  const [newBox, setNewBox] = useState({
+    name: '',
+    size: '',
+    price: '',
+    color: '#ffc0cb',
+    stock: '',
+    status: 'Draft',
+    image: null,
+    imagePreview: null
+  });
+
+  // Complete Boxes page state
+  const [completeBoxes, setCompleteBoxes] = useState([]);
+  const [completeBoxesLoading, setCompleteBoxesLoading] = useState(false);
+  const [showCompleteBoxModal, setShowCompleteBoxModal] = useState(false);
+  const [completeBoxImageZoom, setCompleteBoxImageZoom] = useState(1);
+  const [newCompleteBox, setNewCompleteBox] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: '',
+    items: [],
+    isMostLoved: false,
+    isFeatured: false,
+    stock: '',
+    image: null,
+    imagePreview: null
+  });
+  const [completeBoxItems, setCompleteBoxItems] = useState([{ name: '', quantity: 1 }]);
+
   // Orders page state
   const [orderSearch, setOrderSearch] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('All');
@@ -141,6 +176,14 @@ export default function AdminDashboard() {
   useEffect(() => {
     filterItems();
   }, [selectedCategory, selectedSubcategory, searchTerm, giftItems]);
+
+  useEffect(() => {
+    if (activeTab === 'boxes') {
+      fetchBoxes();
+    } else if (activeTab === 'complete-boxes') {
+      fetchCompleteBoxes();
+    }
+  }, [activeTab]);
 
   const fetchGiftItems = async () => {
     try {
@@ -649,6 +692,105 @@ export default function AdminDashboard() {
     );
   };
 
+  const fetchBoxes = async () => {
+    try {
+      setBoxesLoading(true);
+      const response = await fetch('http://localhost:5000/api/boxes');
+      const data = await response.json();
+      if (data.success) {
+        setBoxes(data.boxes || []);
+      }
+    } catch (error) {
+      console.error('Error fetching boxes:', error);
+    } finally {
+      setBoxesLoading(false);
+    }
+  };
+
+  const deleteBox = async (boxId) => {
+    if (!confirm('Are you sure you want to delete this box?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/boxes/${boxId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        alert('Box deleted successfully!');
+        fetchBoxes();
+      }
+    } catch (error) {
+      console.error('Error deleting box:', error);
+      alert('Error deleting box');
+    }
+  };
+
+  const renderBoxes = () => {
+    return (
+      <div className="products-container">
+        <div className="products-header">
+          <div>
+            <h1>Boxes Management</h1>
+            <p>Manage empty gift boxes for custom orders</p>
+          </div>
+          <button className="new-product-btn" onClick={() => { setShowBoxModal(true); }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Box
+          </button>
+        </div>
+
+        {boxesLoading ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#666' }}>
+            <p>Loading boxes...</p>
+          </div>
+        ) : boxes.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#666' }}>
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" style={{ margin: '0 auto 1rem' }}>
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+            <p>No boxes yet. Add boxes to appear in the Create Box page.</p>
+          </div>
+        ) : (
+          <div className="products-grid" style={{ padding: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+            {boxes.map(box => (
+              <div key={box._id} className="product-card" style={{ border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem', backgroundColor: '#fff' }}>
+                {box.image && (
+                  <div style={{ width: '100%', height: '200px', backgroundColor: '#f5f5f5', borderRadius: '8px', marginBottom: '1rem', overflow: 'hidden' }}>
+                    <img 
+                      src={`/images/products/ebox/${box.image}`} 
+                      alt={box.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                )}
+                <h3 style={{ margin: '0.5rem 0', fontSize: '1.1rem' }}>{box.name}</h3>
+                <p style={{ color: '#666', fontSize: '0.9rem', margin: '0.25rem 0' }}>Size: {box.size || 'N/A'}</p>
+                <p style={{ color: '#666', fontSize: '0.9rem', margin: '0.25rem 0' }}>Color: {box.color || 'N/A'}</p>
+                <p style={{ fontWeight: 'bold', fontSize: '1.2rem', margin: '0.5rem 0' }}>${parseFloat(box.price).toFixed(2)}</p>
+                <p style={{ color: box.inStock ? '#4caf50' : '#f44336', fontSize: '0.9rem', margin: '0.25rem 0' }}>
+                  {box.inStock ? `In Stock (${box.stockQuantity || 0})` : 'Out of Stock'}
+                </p>
+                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    onClick={() => deleteBox(box._id)}
+                    style={{ flex: 1, padding: '0.5rem', backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderProducts = () => {
     // Mock product data
     const mockProducts = [
@@ -955,6 +1097,648 @@ export default function AdminDashboard() {
       console.error('Error adding product:', error);
       alert('Error adding product: ' + error.message);
     }
+  };
+
+  // Box Modal Handlers
+  const handleBoxImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewBox({
+        ...newBox,
+        image: file,
+        imagePreview: URL.createObjectURL(file)
+      });
+    }
+  };
+
+  const handleBoxInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewBox({
+      ...newBox,
+      [name]: value
+    });
+  };
+
+  const handleAddBox = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('name', newBox.name);
+      formData.append('size', newBox.size);
+      formData.append('price', newBox.price);
+      formData.append('color', newBox.color);
+      formData.append('stock', newBox.stock || 0);
+      formData.append('inStock', newBox.status === 'Published');
+      if (newBox.image) {
+        formData.append('image', newBox.image);
+      }
+
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/boxes', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        alert('Box added successfully!');
+        setShowBoxModal(false);
+        setNewBox({
+          name: '',
+          size: '',
+          price: '',
+          color: '#ffc0cb',
+          stock: '',
+          status: 'Draft',
+          image: null,
+          imagePreview: null
+        });
+        setBoxImageZoom(1);
+        fetchBoxes(); // Refresh the boxes list
+      } else {
+        const error = await response.json();
+        alert('Error adding box: ' + (error.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error adding box:', error);
+      alert('Error adding box: ' + error.message);
+    }
+  };
+
+  const renderBoxModal = () => {
+    if (!showBoxModal) return null;
+
+    return (
+      <div className="modal-overlay" onClick={() => setShowBoxModal(false)}>
+        <div className="modal-content product-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>Add New Box</h2>
+            <button className="modal-close" onClick={() => setShowBoxModal(false)}>×</button>
+          </div>
+          
+          <div className="modal-body">
+            <div className="product-form-grid">
+              {/* Image Upload */}
+              <div className="form-section full-width">
+                <label className="form-label">Box Image</label>
+                <div className="image-upload-area">
+                  {newBox.imagePreview ? (
+                    <div className="image-preview-container">
+                      <img 
+                        src={newBox.imagePreview} 
+                        alt="Preview" 
+                        className="image-preview" 
+                        style={{ transform: `scale(${boxImageZoom})` }}
+                      />
+                      <div className="image-controls">
+                        <button className="zoom-btn" onClick={() => setBoxImageZoom(prev => Math.min(prev + 0.1, 3))} type="button">+</button>
+                        <span className="zoom-level">{Math.round(boxImageZoom * 100)}%</span>
+                        <button className="zoom-btn" onClick={() => setBoxImageZoom(prev => Math.max(prev - 0.1, 0.5))} type="button">−</button>
+                        <button className="zoom-btn reset-btn" onClick={() => setBoxImageZoom(1)} type="button">Reset</button>
+                      </div>
+                      <button 
+                        className="remove-image-btn"
+                        onClick={() => { setNewBox({...newBox, image: null, imagePreview: null}); setBoxImageZoom(1); }}
+                        type="button"
+                      >Remove</button>
+                    </div>
+                  ) : (
+                    <label className="image-upload-label">
+                      <input type="file" accept="image/*,.jfif" onChange={handleBoxImageUpload} style={{ display: 'none' }} />
+                      <div className="upload-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Click to upload or drag and drop</p>
+                        <span>PNG, JPG, JFIF or GIF</span>
+                      </div>
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Box Name */}
+              <div className="form-section full-width">
+                <label className="form-label">Box Name *</label>
+                <input type="text" name="name" value={newBox.name} onChange={handleBoxInputChange} className="form-input" placeholder="Enter box name" required />
+              </div>
+
+              {/* Size */}
+              <div className="form-section">
+                <label className="form-label">Size *</label>
+                <input type="text" name="size" value={newBox.size} onChange={handleBoxInputChange} className="form-input" placeholder="e.g., 8 x 8 x 3" required />
+              </div>
+
+              {/* Price */}
+              <div className="form-section">
+                <label className="form-label">Price ($) *</label>
+                <input type="number" name="price" value={newBox.price} onChange={handleBoxInputChange} className="form-input" placeholder="0.00" step="0.01" min="0" required />
+              </div>
+
+              {/* Color */}
+              <div className="form-section">
+                <label className="form-label">Color (Hex)</label>
+                <input type="text" name="color" value={newBox.color} onChange={handleBoxInputChange} className="form-input" placeholder="#ffc0cb" />
+              </div>
+
+              {/* Stock */}
+              <div className="form-section">
+                <label className="form-label">Stock Quantity</label>
+                <input type="number" name="stock" value={newBox.stock} onChange={handleBoxInputChange} className="form-input" placeholder="0" min="0" />
+              </div>
+
+              {/* Status */}
+              <div className="form-section full-width">
+                <label className="form-label">Status</label>
+                <select name="status" value={newBox.status} onChange={handleBoxInputChange} className="form-input">
+                  <option value="Draft">Draft</option>
+                  <option value="Published">Published</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button className="cancel-btn" onClick={() => setShowBoxModal(false)}>Cancel</button>
+            <button className="save-btn" onClick={handleAddBox}>Add Box</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Complete Box Handlers
+  const handleCompleteBoxImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewCompleteBox({
+        ...newCompleteBox,
+        image: file,
+        imagePreview: URL.createObjectURL(file)
+      });
+    }
+  };
+
+  const handleCompleteBoxInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setNewCompleteBox({
+      ...newCompleteBox,
+      [name]: type === 'checkbox' ? checked : value
+    });
+  };
+
+  const handleCompleteBoxItemChange = (index, field, value) => {
+    const updatedItems = [...completeBoxItems];
+    updatedItems[index][field] = value;
+    setCompleteBoxItems(updatedItems);
+  };
+
+  const addCompleteBoxItem = () => {
+    setCompleteBoxItems([...completeBoxItems, { name: '', quantity: 1 }]);
+  };
+
+  const removeCompleteBoxItem = (index) => {
+    const updatedItems = completeBoxItems.filter((_, i) => i !== index);
+    setCompleteBoxItems(updatedItems);
+  };
+
+  const handleAddCompleteBox = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('name', newCompleteBox.name);
+      formData.append('description', newCompleteBox.description);
+      formData.append('price', newCompleteBox.price);
+      formData.append('category', newCompleteBox.category);
+      formData.append('items', JSON.stringify(completeBoxItems));
+      formData.append('isMostLoved', newCompleteBox.isMostLoved);
+      formData.append('isFeatured', newCompleteBox.isFeatured);
+      formData.append('stockQuantity', newCompleteBox.stock || 0);
+      formData.append('inStock', true);
+      if (newCompleteBox.image) {
+        formData.append('image', newCompleteBox.image);
+      }
+
+      const response = await completeBoxAPI.create(formData);
+
+      if (response.success) {
+        alert('Complete box added successfully!');
+        setShowCompleteBoxModal(false);
+        setNewCompleteBox({
+          name: '',
+          description: '',
+          price: '',
+          category: '',
+          items: [],
+          isMostLoved: false,
+          isFeatured: false,
+          stock: '',
+          image: null,
+          imagePreview: null
+        });
+        setCompleteBoxItems([{ name: '', quantity: 1 }]);
+        setCompleteBoxImageZoom(1);
+        fetchCompleteBoxes(); // Refresh the complete boxes list
+      }
+    } catch (error) {
+      console.error('Error adding complete box:', error);
+      alert('Error adding complete box: ' + error.message);
+    }
+  };
+
+  const renderCompleteBoxModal = () => {
+    if (!showCompleteBoxModal) return null;
+
+    const boxCategories = [
+      'Birthday',
+      'Anniversary',
+      'Wedding',
+      'Baby Shower',
+      'Graduation',
+      'Thank You',
+      'Get Well',
+      'Sympathy',
+      'Holiday',
+      'Just Because'
+    ];
+
+    return (
+      <div className="modal-overlay" onClick={() => setShowCompleteBoxModal(false)}>
+        <div className="modal-content product-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '900px' }}>
+          <div className="modal-header">
+            <h2>Add New Gift Box</h2>
+            <button className="modal-close" onClick={() => setShowCompleteBoxModal(false)}>×</button>
+          </div>
+          
+          <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+            <div className="product-form-grid">
+              {/* Image Upload */}
+              <div className="form-section full-width">
+                <label className="form-label">Gift Box Image</label>
+                <div className="image-upload-area">
+                  {newCompleteBox.imagePreview ? (
+                    <div className="image-preview-container">
+                      <img 
+                        src={newCompleteBox.imagePreview} 
+                        alt="Preview" 
+                        className="image-preview" 
+                        style={{ transform: `scale(${completeBoxImageZoom})` }}
+                      />
+                      <div className="image-controls">
+                        <button 
+                          className="zoom-btn"
+                          onClick={() => setCompleteBoxImageZoom(prev => Math.min(prev + 0.1, 3))}
+                          type="button"
+                        >
+                          +
+                        </button>
+                        <span className="zoom-level">{Math.round(completeBoxImageZoom * 100)}%</span>
+                        <button 
+                          className="zoom-btn"
+                          onClick={() => setCompleteBoxImageZoom(prev => Math.max(prev - 0.1, 0.5))}
+                          type="button"
+                        >
+                          −
+                        </button>
+                        <button 
+                          className="zoom-btn reset-btn"
+                          onClick={() => setCompleteBoxImageZoom(1)}
+                          type="button"
+                        >
+                          Reset
+                        </button>
+                      </div>
+                      <button 
+                        className="remove-image-btn"
+                        onClick={() => {
+                          setNewCompleteBox({...newCompleteBox, image: null, imagePreview: null});
+                          setCompleteBoxImageZoom(1);
+                        }}
+                        type="button"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="image-upload-label">
+                      <input 
+                        type="file" 
+                        accept="image/*,.jfif" 
+                        onChange={handleCompleteBoxImageUpload} 
+                        style={{ display: 'none' }} 
+                      />
+                      <div className="upload-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Click to upload or drag and drop</p>
+                        <p style={{ fontSize: '12px', color: '#999' }}>PNG, JPG, GIF, JFIF up to 5MB</p>
+                      </div>
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Name */}
+              <div className="form-section">
+                <label className="form-label">Box Name*</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={newCompleteBox.name}
+                  onChange={handleCompleteBoxInputChange}
+                  className="form-input"
+                  placeholder="e.g., Birthday Celebration Box"
+                />
+              </div>
+
+              {/* Price */}
+              <div className="form-section">
+                <label className="form-label">Price*</label>
+                <div className="input-with-icon">
+                  <span className="input-icon">$</span>
+                  <input
+                    type="number"
+                    name="price"
+                    value={newCompleteBox.price}
+                    onChange={handleCompleteBoxInputChange}
+                    className="form-input"
+                    placeholder="0.00"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+
+              {/* Category */}
+              <div className="form-section">
+                <label className="form-label">Occasion Category*</label>
+                <select
+                  name="category"
+                  value={newCompleteBox.category}
+                  onChange={handleCompleteBoxInputChange}
+                  className="form-input"
+                >
+                  <option value="">Select occasion</option>
+                  {boxCategories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Stock */}
+              <div className="form-section">
+                <label className="form-label">Stock Quantity</label>
+                <input
+                  type="number"
+                  name="stock"
+                  value={newCompleteBox.stock}
+                  onChange={handleCompleteBoxInputChange}
+                  className="form-input"
+                  placeholder="0"
+                />
+              </div>
+
+              {/* Description */}
+              <div className="form-section full-width">
+                <label className="form-label">Description</label>
+                <textarea
+                  name="description"
+                  value={newCompleteBox.description}
+                  onChange={handleCompleteBoxInputChange}
+                  className="form-input"
+                  placeholder="Describe this gift box..."
+                  rows="3"
+                />
+              </div>
+
+              {/* Items List */}
+              <div className="form-section full-width">
+                <label className="form-label">Box Contents</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {completeBoxItems.map((item, index) => (
+                    <div key={index} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        value={item.name}
+                        onChange={(e) => handleCompleteBoxItemChange(index, 'name', e.target.value)}
+                        className="form-input"
+                        placeholder="Item name"
+                        style={{ flex: 2 }}
+                      />
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) => handleCompleteBoxItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
+                        className="form-input"
+                        placeholder="Qty"
+                        min="1"
+                        style={{ flex: 0.5 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeCompleteBoxItem(index)}
+                        className="zoom-btn"
+                        style={{ padding: '8px 12px' }}
+                        disabled={completeBoxItems.length === 1}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addCompleteBoxItem}
+                    className="zoom-btn"
+                    style={{ width: 'fit-content', padding: '8px 16px' }}
+                  >
+                    + Add Item
+                  </button>
+                </div>
+              </div>
+
+              {/* Flags */}
+              <div className="form-section full-width" style={{ display: 'flex', gap: '20px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    name="isMostLoved"
+                    checked={newCompleteBox.isMostLoved}
+                    onChange={handleCompleteBoxInputChange}
+                  />
+                  <span>Most Loved (Show on homepage)</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    name="isFeatured"
+                    checked={newCompleteBox.isFeatured}
+                    onChange={handleCompleteBoxInputChange}
+                  />
+                  <span>Featured (Priority in shop)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button className="cancel-btn" onClick={() => setShowCompleteBoxModal(false)}>Cancel</button>
+            <button className="save-btn" onClick={handleAddCompleteBox}>Add Gift Box</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const fetchCompleteBoxes = async () => {
+    try {
+      setCompleteBoxesLoading(true);
+      const response = await fetch('http://localhost:5000/api/complete-boxes');
+      const data = await response.json();
+      if (data.success) {
+        setCompleteBoxes(data.boxes || []);
+      }
+    } catch (error) {
+      console.error('Error fetching complete boxes:', error);
+    } finally {
+      setCompleteBoxesLoading(false);
+    }
+  };
+
+  const deleteCompleteBox = async (boxId) => {
+    if (!confirm('Are you sure you want to delete this complete box?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/complete-boxes/${boxId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        alert('Complete box deleted successfully!');
+        fetchCompleteBoxes();
+      }
+    } catch (error) {
+      console.error('Error deleting complete box:', error);
+      alert('Error deleting complete box');
+    }
+  };
+
+  const toggleMostLoved = async (boxId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/complete-boxes/${boxId}/toggle-most-loved`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        fetchCompleteBoxes();
+      }
+    } catch (error) {
+      console.error('Error toggling most loved:', error);
+    }
+  };
+
+  const renderCompleteBoxes = () => {
+    return (
+      <div className="products-container">
+        <div className="products-header">
+          <div>
+            <h1>Complete Gift Boxes</h1>
+            <p>Manage pre-made gift boxes for special occasions</p>
+          </div>
+          <button className="new-product-btn" onClick={() => { setShowCompleteBoxModal(true); }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Gift Box
+          </button>
+        </div>
+
+        {completeBoxesLoading ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#666' }}>
+            <p>Loading gift boxes...</p>
+          </div>
+        ) : completeBoxes.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#666' }}>
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" style={{ margin: '0 auto 1rem' }}>
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+              <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+              <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <p>No gift boxes yet. Add complete gift boxes to feature on homepage and shop page.</p>
+          </div>
+        ) : (
+          <div className="products-grid" style={{ padding: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            {completeBoxes.map(box => (
+              <div key={box._id} className="product-card" style={{ border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem', backgroundColor: '#fff', position: 'relative' }}>
+                {box.isMostLoved && (
+                  <div style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: '#ff6b9d', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                    ❤️ Most Loved
+                  </div>
+                )}
+                {box.isFeatured && (
+                  <div style={{ position: 'absolute', top: box.isMostLoved ? '40px' : '10px', right: '10px', backgroundColor: '#ffa500', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                    ⭐ Featured
+                  </div>
+                )}
+                {box.image && (
+                  <div style={{ width: '100%', height: '200px', backgroundColor: '#f5f5f5', borderRadius: '8px', marginBottom: '1rem', overflow: 'hidden' }}>
+                    <img 
+                      src={`/images/products/complete-boxes/${box.image}`} 
+                      alt={box.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                )}
+                <h3 style={{ margin: '0.5rem 0', fontSize: '1.1rem' }}>{box.name}</h3>
+                <p style={{ color: '#666', fontSize: '0.85rem', margin: '0.5rem 0' }}>{box.description}</p>
+                <p style={{ color: '#888', fontSize: '0.8rem', margin: '0.25rem 0' }}>Category: {box.category}</p>
+                {box.items && box.items.length > 0 && (
+                  <div style={{ margin: '0.5rem 0', fontSize: '0.8rem', color: '#666' }}>
+                    <strong>Contents:</strong>
+                    <ul style={{ margin: '0.25rem 0', paddingLeft: '1.5rem' }}>
+                      {box.items.slice(0, 3).map((item, idx) => (
+                        <li key={idx}>{item.name} ({item.quantity})</li>
+                      ))}
+                      {box.items.length > 3 && <li>...and {box.items.length - 3} more</li>}
+                    </ul>
+                  </div>
+                )}
+                <p style={{ fontWeight: 'bold', fontSize: '1.3rem', margin: '0.5rem 0', color: '#ff6b9d' }}>${parseFloat(box.price).toFixed(2)}</p>
+                <p style={{ color: box.inStock ? '#4caf50' : '#f44336', fontSize: '0.9rem', margin: '0.25rem 0' }}>
+                  {box.inStock ? `In Stock (${box.stockQuantity || 0})` : 'Out of Stock'}
+                </p>
+                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <button 
+                    onClick={() => toggleMostLoved(box._id)}
+                    style={{ flex: 1, minWidth: '100px', padding: '0.5rem', backgroundColor: box.isMostLoved ? '#ff6b9d' : '#e0e0e0', color: box.isMostLoved ? 'white' : '#666', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}
+                  >
+                    {box.isMostLoved ? '❤️ Loved' : '🤍 Love'}
+                  </button>
+                  <button 
+                    onClick={() => deleteCompleteBox(box._id)}
+                    style={{ flex: 1, minWidth: '100px', padding: '0.5rem', backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   const renderProductModal = () => {
@@ -1967,6 +2751,31 @@ export default function AdminDashboard() {
           </button>
 
           <button 
+            className={`nav-item ${activeTab === 'boxes' ? 'active' : ''}`}
+            onClick={() => setActiveTab('boxes')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+            Boxes
+          </button>
+
+          <button 
+            className={`nav-item ${activeTab === 'complete-boxes' ? 'active' : ''}`}
+            onClick={() => setActiveTab('complete-boxes')}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+              <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+              <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            Gift Boxes
+          </button>
+
+          <button 
             className={`nav-item ${activeTab === 'customers' ? 'active' : ''}`}
             onClick={() => setActiveTab('customers')}
           >
@@ -2041,6 +2850,8 @@ export default function AdminDashboard() {
         <div className="content-area">
           {activeTab === 'dashboard' && renderDashboard()}
           {activeTab === 'products' && renderProducts()}
+          {activeTab === 'boxes' && renderBoxes()}
+          {activeTab === 'complete-boxes' && renderCompleteBoxes()}
           {activeTab === 'orders' && renderOrders()}
           {activeTab === 'customers' && renderCustomers()}
           {activeTab === 'content' && renderContent()}
@@ -2066,6 +2877,12 @@ export default function AdminDashboard() {
 
       {/* Product Modal */}
       {renderProductModal()}
+
+      {/* Box Modal */}
+      {renderBoxModal()}
+
+      {/* Complete Box Modal */}
+      {renderCompleteBoxModal()}
     </div>
   );
 }

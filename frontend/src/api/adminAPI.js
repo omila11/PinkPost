@@ -9,9 +9,13 @@ const getAuthToken = () => {
 const authFetch = async (url, options = {}) => {
   const token = getAuthToken();
   const headers = {
-    'Content-Type': 'application/json',
     ...options.headers,
   };
+
+  // Only set Content-Type for non-FormData requests
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -123,8 +127,104 @@ export const giftboxAPI = {
   },
 };
 
+// Box API (empty boxes)
+export const boxAPI = {
+  getAll: async (filters = {}) => {
+    const queryParams = new URLSearchParams();
+    if (filters.inStock !== undefined) queryParams.append('inStock', filters.inStock);
+
+    const url = `${API_BASE_URL}/boxes${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    return authFetch(url);
+  },
+
+  getById: async (id) => {
+    return authFetch(`${API_BASE_URL}/boxes/${id}`);
+  },
+
+  create: async (boxData) => {
+    return authFetch(`${API_BASE_URL}/boxes`, {
+      method: 'POST',
+      body: JSON.stringify(boxData),
+    });
+  },
+
+  update: async (id, boxData) => {
+    return authFetch(`${API_BASE_URL}/boxes/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(boxData),
+    });
+  },
+
+  delete: async (id) => {
+    return authFetch(`${API_BASE_URL}/boxes/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  toggleStock: async (id) => {
+    return authFetch(`${API_BASE_URL}/boxes/${id}/toggle-stock`, {
+      method: 'PATCH',
+    });
+  },
+};
+
+// Complete Box API (filled/pre-made gift boxes)
+export const completeBoxAPI = {
+  getAll: async (filters = {}) => {
+    const queryParams = new URLSearchParams();
+    if (filters.category) queryParams.append('category', filters.category);
+    if (filters.isMostLoved !== undefined) queryParams.append('isMostLoved', filters.isMostLoved);
+    if (filters.isFeatured !== undefined) queryParams.append('isFeatured', filters.isFeatured);
+    if (filters.inStock !== undefined) queryParams.append('inStock', filters.inStock);
+
+    const url = `${API_BASE_URL}/complete-boxes${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    return authFetch(url);
+  },
+
+  getById: async (id) => {
+    return authFetch(`${API_BASE_URL}/complete-boxes/${id}`);
+  },
+
+  create: async (formData) => {
+    return authFetch(`${API_BASE_URL}/complete-boxes`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        // Don't set Content-Type, let browser set it with boundary for multipart/form-data
+      },
+    });
+  },
+
+  update: async (id, boxData) => {
+    return authFetch(`${API_BASE_URL}/complete-boxes/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(boxData),
+    });
+  },
+
+  delete: async (id) => {
+    return authFetch(`${API_BASE_URL}/complete-boxes/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  toggleStock: async (id) => {
+    return authFetch(`${API_BASE_URL}/complete-boxes/${id}/toggle-stock`, {
+      method: 'PATCH',
+    });
+  },
+
+  toggleMostLoved: async (id) => {
+    return authFetch(`${API_BASE_URL}/complete-boxes/${id}/toggle-most-loved`, {
+      method: 'PATCH',
+    });
+  },
+};
+
 export default {
   auth: authAPI,
   giftItems: giftItemsAPI,
   giftbox: giftboxAPI,
+  boxes: boxAPI,
+  completeBoxes: completeBoxAPI,
 };

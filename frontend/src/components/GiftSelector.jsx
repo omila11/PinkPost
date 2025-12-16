@@ -570,11 +570,11 @@ export default function GiftSelector({ selectedGifts, onAddGift, onRemoveGift })
         const transformedGifts = response.items.map(item => ({
           id: item._id,
           name: item.name,
-          price: item.price,
+          price: parseFloat(item.price) || 0,
           category: item.category,
           subcategory: item.subcategory || '',
           image: item.image || `/images/products/${item.category}/${item.subcategory || 'default'}/default.jpg`,
-          bg: '#ff6b9d' // Default background color
+          bg: item.bg || '#ff6b9d'
         }));
         setGifts(transformedGifts);
         setLoading(false);

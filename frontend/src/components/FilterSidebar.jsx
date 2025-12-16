@@ -1,23 +1,28 @@
 import React, { useState } from 'react';
 
-export default function FilterSidebar() {
+export default function FilterSidebar({ selectedCategory, onCategoryChange }) {
   const [sortBy, setSortBy] = useState('popularity');
-  const [selectedCategories, setSelectedCategories] = useState(['self-care']);
   const [priceRange, setPriceRange] = useState([10, 200]);
 
-  const toggleCategory = (category) => {
-    if (selectedCategories.includes(category)) {
-      setSelectedCategories(selectedCategories.filter(c => c !== category));
-    } else {
-      setSelectedCategories([...selectedCategories, category]);
-    }
-  };
+  const categories = [
+    'All',
+    'Birthday',
+    'Anniversary',
+    'Wedding',
+    'Baby Shower',
+    'Graduation',
+    'Thank You',
+    'Get Well',
+    'Sympathy',
+    'Holiday',
+    'Just Because'
+  ];
 
   return (
     <aside className="filter-sidebar">
       <div className="filter-header">
         <h3>Filter & Sort</h3>
-        <button className="clear-all-btn">Clear All</button>
+        <button className="clear-all-btn" onClick={() => onCategoryChange('All')}>Clear All</button>
       </div>
 
       {/* Sort By */}
@@ -35,42 +40,21 @@ export default function FilterSidebar() {
         </select>
       </div>
 
-      {/* Category */}
+      {/* Occasion Category */}
       <div className="filter-section">
-        <h4>Category</h4>
+        <h4>Occasion</h4>
         <div className="filter-options">
-          <label className="filter-checkbox">
-            <input 
-              type="checkbox" 
-              checked={selectedCategories.includes('birthday')}
-              onChange={() => toggleCategory('birthday')}
-            />
-            <span>Birthday</span>
-          </label>
-          <label className="filter-checkbox">
-            <input 
-              type="checkbox" 
-              checked={selectedCategories.includes('wedding')}
-              onChange={() => toggleCategory('wedding')}
-            />
-            <span>Wedding</span>
-          </label>
-          <label className="filter-checkbox">
-            <input 
-              type="checkbox" 
-              checked={selectedCategories.includes('self-care')}
-              onChange={() => toggleCategory('self-care')}
-            />
-            <span>Self-Care</span>
-          </label>
-          <label className="filter-checkbox">
-            <input 
-              type="checkbox" 
-              checked={selectedCategories.includes('thank-you')}
-              onChange={() => toggleCategory('thank-you')}
-            />
-            <span>Thank You</span>
-          </label>
+          {categories.map(category => (
+            <label key={category} className="filter-checkbox">
+              <input 
+                type="radio" 
+                name="category"
+                checked={selectedCategory === category}
+                onChange={() => onCategoryChange(category)}
+              />
+              <span>{category}</span>
+            </label>
+          ))}
         </div>
       </div>
 
@@ -103,21 +87,6 @@ export default function FilterSidebar() {
         <div className="price-labels">
           <span>${priceRange[0]}</span>
           <span>${priceRange[1]}</span>
-        </div>
-      </div>
-
-      {/* Product Type */}
-      <div className="filter-section">
-        <h4>Product Type</h4>
-        <div className="filter-options">
-          <label className="filter-checkbox">
-            <input type="checkbox" defaultChecked />
-            <span>Gift Boxes</span>
-          </label>
-          <label className="filter-checkbox">
-            <input type="checkbox" />
-            <span>Individual Items</span>
-          </label>
         </div>
       </div>
     </aside>
